@@ -76,7 +76,7 @@ def parse_transcript(html: bytes):
                 break
         if columns is None:
             continue
-        for row in rows[header_index + 1 :]:
+        for row in rows[header_index + 1:]:
             cells = row.find_all(["td", "th"], recursive=False)
             if len(cells) <= max(columns.values()):
                 continue

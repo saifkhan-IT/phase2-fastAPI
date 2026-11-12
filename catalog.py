@@ -85,7 +85,7 @@ def parse_catalog(html: bytes) -> dict[str, dict]:
                     break
         if header_row_index is None:
             continue
-        for row in rows[header_row_index + 1 :]:
+        for row in rows[header_row_index + 1:]:
             cells = row.find_all(["td", "th"], recursive=False)
             if not cells or max(columns.values()) >= len(cells):
                 continue

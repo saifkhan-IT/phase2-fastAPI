@@ -28,7 +28,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -r requirements-dev.txt
       - name: Unit/API tests and coverage gate
-        run: pytest -q tests/test_api.py --cov=main --cov=catalog --cov=audit --cov-report=term-missing --cov-fail-under=80
+              run: python -m pytest -q tests/test_api.py --cov=main --cov=catalog --cov=audit --cov-report=term-missing --cov-fail-under=80
 
   integration:
     name: Live API integration
