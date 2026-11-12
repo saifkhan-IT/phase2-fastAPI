@@ -1,0 +1,58 @@
+name: Phase 3 Quality Gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint (flake8)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Flake8
+        run: flake8 main.py audit.py catalog.py --max-line-length=99
+
+  coverage:
+    name: Pytest (minimum 80% coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Unit/API tests and coverage gate
+        run: pytest -q tests/test_api.py --cov=main --cov=catalog --cov=audit --cov-report=term-missing --cov-fail-under=80
+
+  integration:
+    name: Live API integration
+    needs: [lint, coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Boot FastAPI server
+        run: |
+          nohup uvicorn main:app --host 127.0.0.1 --port 8000 > /tmp/phase3-api.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/openapi.json > /dev/null; then
+              echo "API started successfully"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/phase3-api.log
+          exit 1
+      - name: Execute real HTTP integration test
+        env:
+          LIVE_BASE_URL: http://127.0.0.1:8000
+        run: pytest -v tests/test_live_integration.py

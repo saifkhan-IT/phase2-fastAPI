@@ -1,0 +1,10 @@
+Local verification run on 2026-11-11 (Python 3.13.5):
+
+26 pytest unit and API tests passed.
+Combined coverage across main.py, audit.py, and catalog.py: 99.29%.
+Minimum required coverage: 80%.
+One separate real HTTP integration test passed using a locally booted Uvicorn API.
+
+These are LOCAL results, not GitHub Actions logs. Obtain ci_logs.txt and
+ci_proof.png from your REAL GitHub Actions run after pushing the project.
+The Moodle selftest.zip was not provided, so its checks are unverified.
